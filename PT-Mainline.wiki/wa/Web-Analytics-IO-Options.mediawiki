@@ -1,0 +1,63 @@
+This page presents the java properties that can be set on command line or in eclipse.ini to modify the behavior of Web Analytics persistence. These options are supported on release 9.2 or later.
+
+
+== Properties affecting I/O operations ==
+
+{| 
+!Property
+!Description
+!Allowed values
+!Default value
+|-
+|stats.write
+|Write mode for files on regular drives
+|stream, buffer, temp
+|stream
+|-
+|stats.write.slow
+|Write mode for files on “slow” drives
+|stream, buffer, temp
+|buffer
+|-
+|stats.read
+|Read mode for files on regular drives
+|stream, buffer
+|stream
+|-
+|stats.read.slow
+|Read mode for files on “slow” drives
+|stream, buffer
+|stream
+|-
+|slowDrives
+|The list of drives deemed “slow”.
+|Semicolon-separated list of path prefixes
+|On Windows, network drives and network paths. Empty list on other platforms.
+|}
+
+=== Usage example (in eclipse.ini) ===
+<pre>
+-Dstats.write.slow=temp
+-Dstats.read=buffer
+-DslowDrives=y:;\\machine\share;d:\mounts\drive
+</pre>
+
+== Write modes ==
+{|
+! Mode !! Description !! Recommendation
+|-
+| stream || Data is written synchronously (the system may however use caching if the drive is not removable) || Best data loss security. Best performance for local drives.
+|-
+| buffer || Data is written asynchronously (the system may cache data on any drive) || Best performance for removable (including network) drives.
+|-
+| temp || Data is written synchronously to a local temporary file and then transferred to the final destination upon end of execution || Use when writing speed to the destination is under the required speed. This is the case if a line graph takes time to complete after the end of execution.
+|}
+
+== Read modes ==
+{|
+! Mode !! Description !! Recommendation
+|-
+| stream || Data is read without further buffering (using system or hardware read-ahead mechanisms). || This seems to give the best performance on all drives.
+|-
+| buffer || Software buffering is used (even if system or hardware read-ahead mechanism is available). || Try this mode as an alternative if performance seems poor in “stream” mode.
+|}
